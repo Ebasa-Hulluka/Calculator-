@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bootstrap Calculator</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .calculator {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 100%;
+        max-width: 400px;
+      }
+      .display {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        text-align: right;
+        font-size: 1.8rem;
+        min-height: 70px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      .btn-calc {
+        height: 60px;
+        font-size: 1.2rem;
+        margin: 5px;
+      }
+      .btn-number {
+        background-color: #f8f9fa;
+      }
+      .btn-operator {
+        background-color: #e9ecef;
+      }
+      .btn-equals {
+        background-color: #0d6efd;
+        color: white;
+      }
+      .btn-clear {
+        background-color: #dc3545;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <div class="display" id="display">0</div>
+      <div class="row">
+        <div class="col-3">
+          <button class="btn btn-clear btn-calc w-100" onclick="clearDisplay()">
+            C
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-operator btn-calc w-100"
+            onclick="deleteLast()"
+          >
+            ⌫
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-operator btn-calc w-100"
+            onclick="appendToDisplay('/')"
+          >
+            /
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-operator btn-calc w-100"
+            onclick="appendToDisplay('*')"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-3">
+          <button
+            class="btn btn-number btn-calc w-100"
+            onclick="appendToDisplay('7')"
+          >
+            7
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-number btn-calc w-100"
+            onclick="appendToDisplay('8')"
+          >
+            8
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-number btn-calc w-100"
+            onclick="appendToDisplay('9')"
+          >
+            9
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-operator btn-calc w-100"
+            onclick="appendToDisplay('-')"
+          >
+            -
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-3">
+          <button
+            class="btn btn-number btn-calc w-100"
+            onclick="appendToDisplay('4')"
+          >
+            4
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-number btn-calc w-100"
+            onclick="appendToDisplay('5')"
+          >
+            5
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-number btn-calc w-100"
+            onclick="appendToDisplay('6')"
+          >
+            6
+          </button>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-operator btn-calc w-100"
+            onclick="appendToDisplay('+')"
+          >
+            +
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-9">
+          <div class="row">
+            <div class="col-4">
+              <button
+                class="btn btn-number btn-calc w-100"
+                onclick="appendToDisplay('1')"
+              >
+                1
+              </button>
+            </div>
+            <div class="col-4">
+              <button
+                class="btn btn-number btn-calc w-100"
+                onclick="appendToDisplay('2')"
+              >
+                2
+              </button>
+            </div>
+            <div class="col-4">
+              <button
+                class="btn btn-number btn-calc w-100"
+                onclick="appendToDisplay('3')"
+              >
+                3
+              </button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              <button
+                class="btn btn-number btn-calc w-100"
+                onclick="appendToDisplay('0')"
+              >
+                0
+              </button>
+            </div>
+            <div class="col-4">
+              <button
+                class="btn btn-number btn-calc w-100"
+                onclick="appendToDisplay('.')"
+              >
+                .
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn btn-equals btn-calc h-100 w-100"
+            onclick="calculate()"
+          >
+            =
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let display = document.getElementById("display");
+      let currentInput = "0";
+      let operator = null;
+      let previousInput = "";
+      let shouldResetDisplay = false;
+
+      function updateDisplay() {
+        display.textContent = currentInput;
+      }
+
+      function appendToDisplay(value) {
+        if (shouldResetDisplay) {
+          currentInput = "";
+          shouldResetDisplay = false;
+        }
+
+        if (value === "." && currentInput.includes(".")) {
+          return;
+        }
+
+        if (currentInput === "0" && value !== ".") {
+          currentInput = value;
+        } else {
+          currentInput += value;
+        }
+
+        updateDisplay();
+      }
+
+      function clearDisplay() {
+        currentInput = "0";
+        previousInput = "";
+        operator = null;
+        updateDisplay();
+      }
+
+      function deleteLast() {
+        if (currentInput.length > 1) {
+          currentInput = currentInput.slice(0, -1);
+        } else {
+          currentInput = "0";
+        }
+        updateDisplay();
+      }
+
+      function setOperation(op) {
+        if (operator !== null) {
+          calculate();
+        }
+        operator = op;
+        previousInput = currentInput;
+        shouldResetDisplay = true;
+      }
+
+      function calculate() {
+        let result;
+        const prev = parseFloat(previousInput);
+        const current = parseFloat(currentInput);
+
+        if (isNaN(prev) || isNaN(current)) return;
+
+        switch (operator) {
+          case "+":
+            result = prev + current;
+            break;
+          case "-":
+            result = prev - current;
+            break;
+          case "*":
+            result = prev * current;
+            break;
+          case "/":
+            if (current === 0) {
+              alert("Cannot divide by zero!");
+              return;
+            }
+            result = prev / current;
+            break;
+          default:
+            return;
+        }
+
+        currentInput = result.toString();
+        operator = null;
+        previousInput = "";
+        shouldResetDisplay = true;
+        updateDisplay();
+      }
+
+      // Add event listeners for operator buttons
+      document.querySelectorAll(".btn-operator").forEach((button) => {
+        if (
+          button.textContent === "+" ||
+          button.textContent === "-" ||
+          button.textContent === "×" ||
+          button.textContent === "/"
+        ) {
+          button.addEventListener("click", function () {
+            let op = this.textContent;
+            if (op === "×") op = "*";
+            setOperation(op);
+          });
+        }
+      });
+
+      // Keyboard support
+      document.addEventListener("keydown", function (event) {
+        if (event.key >= "0" && event.key <= "9") {
+          appendToDisplay(event.key);
+        } else if (event.key === ".") {
+          appendToDisplay(".");
+        } else if (
+          event.key === "+" ||
+          event.key === "-" ||
+          event.key === "*" ||
+          event.key === "/"
+        ) {
+          setOperation(event.key);
+        } else if (event.key === "Enter" || event.key === "=") {
+          calculate();
+        } else if (
+          event.key === "Escape" ||
+          event.key === "c" ||
+          event.key === "C"
+        ) {
+          clearDisplay();
+        } else if (event.key === "Backspace") {
+          deleteLast();
+        }
+      });
+
+      // Initialize display
+      updateDisplay();
+    </script>
+  </body>
+</html>
